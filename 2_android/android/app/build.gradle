@@ -1,0 +1,37 @@
+plugins { id 'com.android.application' }
+
+// التوقيع النهائي: يُقرأ من متغيرات البيئة (GitHub Secrets) ولا يُحفظ أي سر داخل المستودع
+def ksFile = System.getenv('JKH_KEYSTORE_FILE')
+def vCode = (System.getenv('JKH_VERSION_CODE') ?: '42') as Integer
+def vName = System.getenv('JKH_VERSION_NAME') ?: '42.0.0'
+
+android {
+    namespace 'org.jkhair.cases'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'org.jkhair.cases'
+        minSdk 23
+        targetSdk 35
+        versionCode vCode
+        versionName vName
+    }
+
+    signingConfigs {
+        if (ksFile) {
+            release {
+                storeFile file(ksFile)
+                storePassword System.getenv('JKH_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('JKH_KEY_ALIAS')
+                keyPassword System.getenv('JKH_KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (ksFile) signingConfig signingConfigs.release
+        }
+    }
+}

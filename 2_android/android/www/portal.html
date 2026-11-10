@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#18864b">
+<title>بوابة الحالات | جمعية الخير للجميع</title>
+<style>
+:root{--g:#18864b;--d:#11663a;--bg:#f1f7f3}*{box-sizing:border-box}body{margin:0;font-family:Tahoma,Arial,sans-serif;background:linear-gradient(140deg,#e7f4eb,#f8fbf9);color:#193326}.wrap{max-width:780px;margin:24px auto;padding:14px}.panel{background:#fff;border-radius:22px;padding:24px;box-shadow:0 12px 38px #173b2515;border:1px solid #e4eee7}.head{text-align:center}.logo{width:88px;height:88px;object-fit:contain;border-radius:16px}.head h1{font-size:23px;color:var(--d);margin:10px 0}.head p{color:#64756b;margin-top:0}.tabs{display:flex;gap:8px;margin:22px 0}.tabs button{flex:1}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:6px}.full{grid-column:1/-1}label{font-size:13px;font-weight:bold;color:#365746}input,select,textarea{width:100%;padding:12px;border:1px solid #d5e3da;border-radius:10px;background:#fff;font:inherit}textarea{min-height:90px;resize:vertical}button{border:0;border-radius:10px;padding:12px 16px;font:inherit;font-weight:bold;cursor:pointer}.primary{background:var(--g);color:white}.secondary{background:#eaf4ed;color:#155f38}.msg{margin-top:14px;padding:12px;border-radius:10px;background:#f0f7f2;white-space:pre-wrap;line-height:1.8;overflow-wrap:anywhere}.hidden{display:none}.hint{font-size:12px;color:#687c70;line-height:1.7}.foot{text-align:center;color:#738379;font-size:12px;margin:15px}button:disabled{opacity:.6;cursor:wait}@media(max-width:560px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.panel{padding:17px}.tabs{flex-direction:column}}
+</style>
+<script src="config.js"></script>
+<script src="jkh-look.js?v=32"></script></head>
+<body><div class="wrap"><main class="panel">
+<header class="head"><img class="logo" src="logo.jpg" onerror="this.style.display='none'"><h1>جمعية الخير للجميع</h1><p>بوابة تسجيل ومتابعة طلبات المساعدة — بني سويف</p></header>
+<div class="tabs"><button id="applyTab" class="primary" type="button" onclick="tab('apply')">تقديم طلب جديد</button><button id="trackTab" class="secondary" type="button" onclick="tab('track')">متابعة طلب سابق</button></div>
+<section id="apply"><form id="applyForm" class="grid">
+<div class="field"><label for="husband">اسم الزوج / مقدم الطلب *</label><input id="husband" required maxlength="160"></div>
+<div class="field"><label for="nid">الرقم القومي *</label><input id="nid" inputmode="numeric" maxlength="14" autocomplete="off" required></div>
+<div class="field"><label for="wife">اسم الزوجة</label><input id="wife" maxlength="160"></div>
+<div class="field"><label for="wifeNid">الرقم القومي للزوجة</label><input id="wifeNid" inputmode="numeric" maxlength="14"></div>
+<div class="field"><label for="phone">هاتف مقدم الطلب *</label><input id="phone" required inputmode="tel" maxlength="40"></div>
+<div class="field"><label for="wifePhone">هاتف الزوجة</label><input id="wifePhone" inputmode="tel" maxlength="40"></div>
+<div class="field"><label for="social">الحالة الاجتماعية</label><select id="social"><option>متزوج</option><option>أرمل</option><option>مطلق</option><option>أعزب</option></select></div>
+<div class="field"><label for="members">عدد أفراد الأسرة</label><input id="members" type="number" min="1" max="30" value="1"></div>
+<div class="field full"><label for="address">العنوان بالتفصيل *</label><input id="address" required maxlength="400"></div>
+<div class="field"><label for="area">المنطقة / القرية</label><input id="area" maxlength="120"></div>
+<div class="field"><label for="need">نوع المساعدة المطلوبة</label><select id="need"><option>مساعدة مالية</option><option>مواد غذائية</option><option>علاج</option><option>أدوية</option><option>إيجار</option><option>تعليم</option><option>أخرى</option></select></div>
+<div class="field full"><label for="notes">شرح الحالة (اختياري)</label><textarea id="notes" maxlength="1500"></textarea></div>
+<div class="field full"><label for="files">المستندات (صور أو PDF، بحد أقصى 8 ميجابايت للملف)</label><input id="files" type="file" accept="image/*,.pdf" multiple><div class="hint">يمكن إرفاق حتى 8 ملفات، بإجمالي لا يتجاوز 20 ميجابايت.</div></div>
+<div class="full"><button id="submitBtn" class="primary" type="submit">إرسال الطلب</button></div></form><div id="applyMsg" class="msg hidden" role="status" aria-live="polite"></div></section>
+<section id="track" class="hidden"><form id="trackForm" class="grid"><div class="field full"><label for="trackNid">الرقم القومي لمقدم الطلب *</label><input id="trackNid" inputmode="numeric" maxlength="14" autocomplete="off" required></div><div class="full"><button id="trackBtn" class="primary" type="submit">عرض حالة الطلب</button></div></form><div id="trackMsg" class="msg hidden" role="status" aria-live="polite"></div><p class="hint">تظهر حالة الطلب والرد المسجل لدى الجمعية عند تطابق الرقم القومي مع طلب محفوظ.</p></section>
+</main><div class="foot">جمعية الخير للجميع — بني سويف</div></div>
+<script>
+const API=(window.JKH_SUPABASE_URL||'https://fpujicazthxvfodgjyui.supabase.co').replace(/\/$/,'')+'/functions/v1/applicant-portal';
+const APIKEY=(window.JKH_SUPABASE_ANON_KEY||"sb_publishable_LKc8ByQL58bEH674K1f5pA_oyAy44Ol");
+const $=id=>document.getElementById(id);
+function tab(which){$('apply').classList.toggle('hidden',which!=='apply');$('track').classList.toggle('hidden',which!=='track');$('applyTab').className=which==='apply'?'primary':'secondary';$('trackTab').className=which==='track'?'primary':'secondary';}
+function digits(v){return String(v||'').replace(/[٠-٩۰-۹]/g,c=>String('٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹'.indexOf(c)%10)).replace(/[^0-9]/g,'');}
+function show(id,text){$(id).textContent=text;$(id).classList.remove('hidden');}
+async function request(form){if(!APIKEY)throw Error('إعداد الاتصال غير مكتمل: لم يتم العثور على مفتاح الاتصال العام في config.js.');const res=await fetch(API,{method:'POST',headers:{apikey:APIKEY},body:form});let data={};try{data=await res.json()}catch{}if(!res.ok)throw Error(data.error||'تعذر الاتصال بالخدمة. حاول مرة أخرى.');return data;}
+$('applyForm').addEventListener('submit',async e=>{e.preventDefault();const btn=$('submitBtn');btn.disabled=true;$('applyMsg').classList.add('hidden');try{
+const nid=digits($('nid').value),wifeNid=digits($('wifeNid').value);if(nid.length!==14)throw Error('الرقم القومي يجب أن يتكون من 14 رقمًا.');if(wifeNid&&wifeNid.length!==14)throw Error('الرقم القومي للزوجة يجب أن يتكون من 14 رقمًا.');
+const files=Array.from($('files').files);if(files.length>8)throw Error('يمكن إرفاق 8 ملفات كحد أقصى.');let total=0;for(const f of files){total+=f.size;if(f.size>8*1024*1024)throw Error('الملف '+f.name+' أكبر من 8 ميجابايت.');if(!(f.type.startsWith('image/')||f.type==='application/pdf'))throw Error('المسموح إرفاق الصور وملفات PDF فقط.');}if(total>20*1024*1024)throw Error('إجمالي حجم المرفقات يجب ألا يتجاوز 20 ميجابايت.');
+const applicant={name:$('husband').value.trim(),national_id:nid,wife:$('wife').value.trim(),wife_national_id:wifeNid,wife_phone:$('wifePhone').value.trim(),phone:$('phone').value.trim(),social:$('social').value,members:Number($('members').value)||1,address:$('address').value.trim(),area:$('area').value.trim(),need:$('need').value,notes:$('notes').value.trim()};
+const body=new FormData();body.set('action','submit');body.set('applicant',JSON.stringify(applicant));for(const f of files)body.append('documents',f,f.name);
+const result=await request(body);show('applyMsg','تم استلام الطلب بنجاح.\nرقم الملف: '+result.case_number+'\nرمز المتابعة: '+result.tracking_token+'\nاحتفظ بالبيانات للرجوع إليها.');$('applyForm').reset();
+}catch(err){show('applyMsg','لم يتم إرسال الطلب. '+(err.message||'حدث خطأ غير متوقع'));}finally{btn.disabled=false;}});
+$('trackForm').addEventListener('submit',async e=>{e.preventDefault();const btn=$('trackBtn');btn.disabled=true;$('trackMsg').classList.add('hidden');try{const nid=digits($('trackNid').value);if(nid.length!==14)throw Error('اكتب الرقم القومي المكوّن من 14 رقمًا.');const body=new FormData();body.set('action','track');body.set('national_id',nid);const r=await request(body);show('trackMsg','رقم الملف: '+r.case_number+'\nحالة الملف: '+r.file_status+'\nرد الجمعية: '+(r.decision_reason||'لم يُسجل رد حتى الآن.')+'\nآخر تحديث: '+(r.updated_at?new Date(r.updated_at).toLocaleString('ar-EG'):'غير متاح'));}catch(err){show('trackMsg',err.message||'تعذر إتمام المتابعة.');}finally{btn.disabled=false;}});
+</script></body></html>
