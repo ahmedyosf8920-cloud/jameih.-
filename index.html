@@ -1167,6 +1167,10 @@ function close(){const o=G('shOv');if(o)o.remove()}
 function overlay(html){close();const o=document.createElement('div');o.id='shOv';o.style.cssText='position:fixed;inset:0;z-index:9998;background:#0009;display:flex;align-items:center;justify-content:center;padding:8px';o.innerHTML='<div style="background:#fff;border-radius:16px;width:100%;max-width:980px;max-height:96vh;overflow:auto;padding:16px">'+html+'</div>';document.body.appendChild(o);return o}
 const AID_TYPES=['مواد غذائية','مبلغ نقدي','ملابس','بطاطين','أجهزة وأدوات','مستلزمات مدرسية','أدوية وعلاج','كراتين رمضان','لحوم','أخرى'];
 function phonesOf(c){const a=[c.phone,c.wa,c.husbandPhone,c.wifePhone].map(v=>String(v||'').trim()).filter(Boolean);return [...new Set(a)].slice(0,3)}
+function phList(r){return (r.phones&&r.phones.length?r.phones:[r.phone]).map(v=>String(v||'').trim()).filter(Boolean)}
+function phHeads(n){return Array.from({length:n},(_,i)=>'هاتف '+(i+1))}
+function phMax(rows){return Math.max(1,...rows.map(r=>phList(r).length))}
+function phTds(r,n){const p=phList(r);let a='';for(let i=0;i<n;i++)a+='<td dir="ltr" style="mso-number-format:\'\\@\'">'+E(p[i]||'-')+'</td>';return a}
 function spNorm(c){const k=t=>String(t||'').replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/\s+/g,'');
  const d=v=>String(v||'').replace(/[٠-٩]/g,x=>'٠١٢٣٤٥٦٧٨٩'.indexOf(x)).replace(/\D/g,'');
  let h=c.husband||'',w=c.wife||'',hn=d(c.husbandNid),wn=d(c.wifeNid);const n=d(c.nid),fem=x=>x.length===14&&(+x[12])%2===0;
@@ -1175,7 +1179,7 @@ function spNorm(c){const k=t=>String(t||'').replace(/[\u064B-\u0652\u0640]/g,'')
  if(h&&k(h)===k(c.name)&&!hn)hn=n;
  if(w&&k(w)===k(c.name)&&!wn)wn=n;
  return {husband:h,wife:w,husbandNid:hn,wifeNid:wn}}
-function snap(c,qty){return {caseId:c.id,caseNo:c.no,caseName:c.name,...spNorm(c),nid:c.nid||'',phones:phonesOf(c),address:c.address||c.area||'',members:c.members||'',fileStatus:c.status||'',name:c.name,phone:c.phone||'',qty:qty,received:false,inserted:false}}
+function snap(c,qty){return {caseId:c.id,caseNo:c.no,caseName:c.name,...spNorm(c),nid:c.nid||'',phones:phonesOf(c),address:c.address||c.area||'',members:c.members||'',fileStatus:c.status||'',social:c.social||'',name:c.name,phone:c.phone||'',qty:qty,received:false,inserted:false}}
 function info(r){const c=cases.find(z=>z.id===r.caseId);return c?{...r,...snap(c,r.qty),received:r.received,inserted:r.inserted}:r}
 let sel=new Map();   // caseId -> qty
 let editing=null;
@@ -1276,11 +1280,11 @@ const S={
   save();close();window.renderSheets();tst('تم حفظ الكشف');
  },
  open(id){
-  const x=SH().find(z=>z.id===id);if(!x)return;
+  const x=SH().find(z=>z.id===id);if(!x)return;const NP=phMax(x.rows.map(info));
   overlay(`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3 style="margin:0">${E(x.name)}</h3><div><button class="secondary" onclick="Sheets.print('${x.id}')">🖨 طباعة / PDF</button> <button class="secondary" onclick="Sheets.xls('${x.id}')">⬇ تنزيل Excel</button> <button class="secondary" onclick="Sheets.edit('${x.id}')">تعديل الحالات</button> <button class="secondary" onclick="Sheets.waAll('${x.id}')">📲 رسالة لكل المستلمين</button> <button class="secondary" onclick="Sheets.close()">إغلاق ✕</button></div></div>
   <div style="margin:8px 0;color:#4c6a5a">التاريخ: ${E(x.date)} — النوع: ${E(x.type)}${x.kind==='kids'?' (أطفال من '+(x.kidFrom==null?0:x.kidFrom)+' إلى '+(x.kidTo==null?'':x.kidTo)+' سنة)':''} — الحالة: <b>${E(x.status)}</b>${x.note?' — '+E(x.note):''}</div>
   <div style="margin:8px 0"><label>إدراج المستلمين في كشوف التسليم عند تأكيد الاستلام؟</label> <select id="shAdd2"><option value="1" ${x.addToDist?'selected':''}>نعم</option><option value="0" ${!x.addToDist?'selected':''}>لا</option></select></div>
-  <div style="overflow:auto"><table><thead><tr><th>م</th><th>رقم الحالة</th><th>الزوج</th><th>الزوجة</th><th>الرقم القومي للزوج</th><th>الرقم القومي للزوجة</th><th>الهاتف</th><th>العنوان</th><th>الأفراد</th><th>الأطفال (السن)</th><th>الكمية</th><th>تم الاستلام</th><th>أدرج</th><th>واتساب</th></tr></thead><tbody>${x.rows.map(info).map((r,i)=>`<tr><td>${i+1}</td><td>${E(r.caseNo)}<br><small>${E(r.caseName)}</small></td><td>${E(r.husband||'-')}</td><td>${E(r.wife||'-')}</td><td dir="ltr">${E(r.husbandNid||'-')}</td><td dir="ltr">${E(r.wifeNid||'-')}</td><td>${(r.phones||[r.phone]).map(E).join('<br>')}</td><td>${E(r.address)}</td><td>${E(r.members)}</td><td>${(r.children&&r.children.length)?r.children.map(k=>E(k.name)+' ('+k.age+')').join('<br>'):'—'}</td><td><input value="${E(r.qty)}" style="width:70px" onchange="Sheets.qty('${x.id}',${i},this.value)"></td><td><input type="checkbox" id="shr${i}" ${r.received?'checked':''} ${r.inserted?'disabled':''} style="width:20px;height:20px"></td><td>${r.inserted?'✔':'-'}</td><td><button class="secondary" onclick="Sheets.wa('${x.id}',${i})">📲</button></td></tr>`).join('')}</tbody></table></div>
+  <div style="overflow:auto"><table><thead><tr><th>م</th><th>رقم الحالة</th><th>الزوج</th><th>الزوجة</th><th>الرقم القومي للزوج</th><th>الرقم القومي للزوجة</th>${phHeads(NP).map(h=>'<th>'+h+'</th>').join('')}<th>الحالة الاجتماعية</th><th>العنوان</th><th>الأفراد</th><th>الأطفال (السن)</th><th>الكمية</th><th>تم الاستلام</th><th>أدرج</th><th>واتساب</th></tr></thead><tbody>${x.rows.map(info).map((r,i)=>`<tr><td>${i+1}</td><td>${E(r.caseNo)}<br><small>${E(r.caseName)}</small></td><td>${E(r.husband||'-')}</td><td>${E(r.wife||'-')}</td><td dir="ltr">${E(r.husbandNid||'-')}</td><td dir="ltr">${E(r.wifeNid||'-')}</td>${phTds(r,NP)}<td>${E(r.social||'-')}</td><td>${E(r.address)}</td><td>${E(r.members)}</td><td>${(r.children&&r.children.length)?r.children.map(k=>E(k.name)+' ('+k.age+')').join('<br>'):'—'}</td><td><input value="${E(r.qty)}" style="width:70px" onchange="Sheets.qty('${x.id}',${i},this.value)"></td><td><input type="checkbox" id="shr${i}" ${r.received?'checked':''} ${r.inserted?'disabled':''} style="width:20px;height:20px"></td><td>${r.inserted?'✔':'-'}</td><td><button class="secondary" onclick="Sheets.wa('${x.id}',${i})">📲</button></td></tr>`).join('')}</tbody></table></div>
   <div style="display:flex;gap:8px;margin-top:12px"><button class="primary" style="flex:2" onclick="Sheets.confirm('${x.id}')">حفظ حالة الاستلام</button><button class="secondary" style="flex:1" onclick="Sheets.recAll('${x.id}')">تحديد الكل مستلم</button></div>`);
  },
   recs(x){return x.rows.map((r0,i)=>{const r=info(r0);const c=cases.find(z=>z.id===r.caseId)||{};return {key:'s'+x.id+i,name:r.caseName||r.name,phone:c.wa||c.phone||c.husbandPhone||c.wifePhone||(r.phones&&r.phones[0])||r.phone||'',vars:{'الاسم':r.husband||r.wife||r.caseName||r.name,'رقم_الحالة':r.caseNo,'التاريخ':x.date,'النوع':x.type,'الكمية':String(r.qty||'')}}})},
@@ -1308,12 +1312,12 @@ const S={
   const qs=rows.map(r=>numOf(r.qty)).filter(v=>v!==null),qtot=qs.length?qs.reduce((a,b)=>a+b,0):null;
   const phones=r=>(r.phones&&r.phones.length?r.phones:[r.phone||'']).filter(Boolean);
   const kidsTxt=r=>(r.children||[]).map(k=>k.name+' ('+k.age+' سنة)');
-  const th=['م','رقم الحالة','اسم الحالة','اسم الزوج','الرقم القومي للزوج','اسم الزوجة','الرقم القومي للزوجة','الهاتف','العنوان','الأفراد'].concat(hasKids?['الأطفال (الاسم والسن)']:[]).concat(['الكمية','التوقيع / البصمة']);
+  const phN=phMax(rows);const th=['م','رقم الحالة','اسم الحالة','اسم الزوج','الرقم القومي للزوج','اسم الزوجة','الرقم القومي للزوجة'].concat(phHeads(phN),['الحالة الاجتماعية','العنوان','الأفراد']).concat(hasKids?['الأطفال (الاسم والسن)']:[]).concat(['الكمية','التوقيع / البصمة']);
   if(!forPrint){
-   const rx=rows.map((r,i)=>'<tr><td>'+(i+1)+'</td><td style="mso-number-format:\'\\@\'">'+E(r.caseNo)+'</td><td>'+E(r.caseName)+'</td><td>'+E(r.husband)+'</td><td style="mso-number-format:\'\\@\'">'+E(r.husbandNid)+'</td><td>'+E(r.wife)+'</td><td style="mso-number-format:\'\\@\'">'+E(r.wifeNid)+'</td><td style="mso-number-format:\'\\@\'">'+E(phones(r).join(' / '))+'</td><td>'+E(r.address)+'</td><td>'+E(r.members)+'</td>'+(hasKids?'<td>'+E(kidsTxt(r).join('، '))+'</td>':'')+'<td>'+E(r.qty)+'</td><td></td></tr>').join('');
+   const rx=rows.map((r,i)=>'<tr><td>'+(i+1)+'</td><td style="mso-number-format:\'\\@\'">'+E(r.caseNo)+'</td><td>'+E(r.caseName)+'</td><td>'+E(r.husband)+'</td><td style="mso-number-format:\'\\@\'">'+E(r.husbandNid)+'</td><td>'+E(r.wife)+'</td><td style="mso-number-format:\'\\@\'">'+E(r.wifeNid)+'</td></td>'+phTds(r,phN)+'<td>'+E(r.social||'')+'</td><td>'+E(r.address)+'</td><td>'+E(r.members)+'</td>'+(hasKids?'<td>'+E(kidsTxt(r).join('، '))+'</td>':'')+'<td>'+E(r.qty)+'</td><td></td></tr>').join('');
    return '<html dir="rtl"><head><meta charset="utf-8"></head><body><h2>'+E(x.name)+'</h2><p>التاريخ: '+E(x.date)+' — النوع: '+E(x.type)+' — الحالة: '+E(x.status)+(kidTxt?' — '+E(kidTxt):'')+'</p><table border="1"><tr>'+th.map(t=>'<th>'+t+'</th>').join('')+'</tr>'+rx+'</table></body></html>';
   }
-  const tr=rows.map((r,i)=>'<tr><td class="c">'+(i+1)+'</td><td class="c"><span class="no">'+E(r.caseNo)+'</span></td><td><b>'+E(r.caseName)+'</b></td><td>'+E(r.husband||'—')+'</td><td class="ltr">'+E(r.husbandNid||'—')+'</td><td>'+E(r.wife||'—')+'</td><td class="ltr">'+E(r.wifeNid||'—')+'</td><td class="ltr">'+(phones(r).map(E).join('<br>')||'—')+'</td><td>'+E(r.address||'—')+'</td><td class="c">'+E(r.members||'—')+'</td>'+(hasKids?'<td class="kd">'+(kidsTxt(r).length?kidsTxt(r).map(E).join('<br>'):'—')+'</td>':'')+'<td class="c qty">'+E(r.qty||'—')+'</td><td class="sgc"></td></tr>').join('');
+  const tr=rows.map((r,i)=>'<tr><td class="c">'+(i+1)+'</td><td class="c"><span class="no">'+E(r.caseNo)+'</span></td><td><b>'+E(r.caseName)+'</b></td><td>'+E(r.husband||'—')+'</td><td class="ltr">'+E(r.husbandNid||'—')+'</td><td>'+E(r.wife||'—')+'</td><td class="ltr">'+E(r.wifeNid||'—')+'</td></td>'+phTds(r,phN)+'<td>'+E(r.social||'—')+'</td><td>'+E(r.address||'—')+'</td><td class="c">'+E(r.members||'—')+'</td>'+(hasKids?'<td class="kd">'+(kidsTxt(r).length?kidsTxt(r).map(E).join('<br>'):'—')+'</td>':'')+'<td class="c qty">'+E(r.qty||'—')+'</td><td class="sgc"></td></tr>').join('');
   const tiles=[[n,'حالة'],[fam,'فرد']].concat(hasKids?[[kids,'طفل مستحق']]:[]).concat([[qtot!==null?qtot.toLocaleString('ar-EG'):'—','إجمالي الكمية'],[E(x.status||''),'حالة الكشف']]);
   const kpi=tiles.map(t=>'<div><b>'+t[0]+'</b><span>'+t[1]+'</span></div>').join('');
   const stamp=(window.CaseDocs&&CaseDocs._stamp)?CaseDocs._stamp():'';
@@ -1615,7 +1619,7 @@ try{const tb=document.querySelector('#cases .toolbar');if(tb&&!tb.querySelector(
 <script>
 /* الإصدار 26: قوالب الواتساب + حماية التعارض بين المستخدمين + مؤشر الحفظ + تحديث الإصدار + خروج عند الخمول */
 (function(){
-const APP_VERSION='42';
+const APP_VERSION='43';
 const E=s=>esc(s==null?'':String(s));
 const G=id=>document.getElementById(id);
 const clone=o=>JSON.parse(JSON.stringify(o));
