@@ -31,14 +31,17 @@
         "portable"
       ],
       "icon": "build/icon.ico",
-      "artifactName": "JKH-Cases-${version}-${target}.${ext}",
       "executableName": "JKH-Cases"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "shortcutName": "جمعية الخير للجميع"
+      "shortcutName": "جمعية الخير للجميع",
+      "artifactName": "JKH-Cases-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "JKH-Cases-Portable-${version}.${ext}"
     }
   }
 }
