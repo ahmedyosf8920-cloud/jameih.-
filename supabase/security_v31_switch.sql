@@ -1,0 +1,5 @@
+-- تشغيل/إطفاء الميزات (الإصدار 31). نفّذ سطرًا واحدًا فقط حسب الحاجة.
+-- أولًا: من شاشة المستخدمين اسحب صلاحية "الرقم القومي والهاتف" ممن لا يحتاجها، ثم:
+-- update public.security_config set value='on'  where key='pii_mask';
+-- update public.security_config set value='off' where key='pii_mask';        -- تراجع فوري
+-- update public.security_config set value='on'  where key='records_mirror';  -- ثم نفّذ records_rebuild من حساب المدير

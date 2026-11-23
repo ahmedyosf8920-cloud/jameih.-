@@ -1,0 +1,10 @@
+{
+  "name": "jkh-wa-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test:mock": "MOCK=1 DAILY_LIMIT=3 MIN_DELAY=0.2 MAX_DELAY=0.5 node server.js"
+  }
+}
