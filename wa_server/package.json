@@ -1,10 +1,47 @@
 {
-  "name": "jkh-wa-server",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
+  "name": "jkh-cases-desktop",
+  "productName": "جمعية الخير للجميع",
+  "version": "60.0.0",
+  "description": "نسخة Windows من نظام جمعية الخير للجميع",
+  "main": "main.js",
+  "author": "جمعية الخير للجميع",
+  "license": "UNLICENSED",
   "scripts": {
-    "start": "node server.js",
-    "test:mock": "MOCK=1 DAILY_LIMIT=3 MIN_DELAY=0.2 MAX_DELAY=0.5 node server.js"
+    "start": "electron .",
+    "dist": "electron-builder --win nsis portable --publish never"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "org.jkhair.cases.desktop",
+    "productName": "JKH Cases",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "www/**/*",
+      "build/icon.ico"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "build/icon.ico",
+      "executableName": "JKH-Cases"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "جمعية الخير للجميع",
+      "artifactName": "JKH-Cases-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "JKH-Cases-Portable-${version}.${ext}"
+    }
   }
 }
