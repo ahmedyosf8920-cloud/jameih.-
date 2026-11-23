@@ -1,0 +1,51 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>إدارة التبرعات | جمعية الخير للجميع</title><script src="config.js"></script><style>
+body{font-family:Tahoma,Arial,sans-serif;background:#f3f8f5;color:#173d2d;margin:0}.wrap{max-width:1150px;margin:auto;padding:16px}.card{background:#fff;border:1px solid #d9e9e0;border-radius:16px;padding:16px;margin:12px 0}h1,h2,h3{color:#075b3a;margin:6px 0}
+input,select,textarea{font:inherit;padding:10px;border:1px solid #d4e3da;border-radius:9px;max-width:100%;box-sizing:border-box}button{font:inherit;border:0;border-radius:9px;padding:9px 13px;cursor:pointer;background:#16864b;color:#fff;margin:2px}button:disabled{opacity:.55;cursor:wait}.secondary{background:#e8f4ec;color:#075b3a}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.field{display:grid;gap:6px;margin:10px 0}.hidden{display:none!important}.small{font-size:12px;color:#687a70}
+#flash{position:sticky;top:6px;z-index:5;padding:12px 14px;border-radius:12px;margin:10px 0;font-weight:700;background:#e4f5ea;border:1px solid #9fd5b1;color:#075b3a}#flash.err{background:#fde8e6;border-color:#f0a8a0;color:#9b2c20}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.chip{border:1px solid #cfe3d6;background:#fff;color:#075b3a;border-radius:99px;padding:8px 14px;font-weight:700;cursor:pointer}.chip b{background:#075b3a;color:#fff;border-radius:99px;padding:1px 9px;margin-right:6px}.chip.warn{border-color:#f0c36a;background:#fff9e8}
+.tbl{overflow:auto}table{width:100%;border-collapse:collapse;min-width:640px}th,td{text-align:right;padding:9px;border-bottom:1px solid #e5eee8;vertical-align:top;font-size:14px;white-space:pre-line}th{background:#eaf5ed;white-space:nowrap}.empty{padding:14px;color:#687a70}
+.sec-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.dot{width:12px;height:12px;border-radius:50%;display:inline-block}.badge{display:inline-block;padding:3px 10px;border-radius:99px;background:#eaf5ed;font-size:13px}
+.kv{display:grid;grid-template-columns:140px 1fr;gap:5px 10px;font-size:14px}.kv b{color:#4c6a5a}#detail{border:2px solid #16864b}.decide{display:grid;gap:8px;margin-top:12px;max-width:560px}.decide textarea{min-height:70px}
+@media(max-width:650px){.wrap{padding:8px}.card{padding:10px}.kv{grid-template-columns:105px 1fr}}
+</style><script src="jkh-look.js?v=32"></script></head><body><div class="wrap"><h1>إدارة متجر التبرعات</h1><p class="small">للموظفين المخولين فقط. لا يتم تأكيد أي تبرع إلا بعد مراجعة الإيصال والتحقق من وصول الأموال.</p>
+<section id="login" class="card"><h2>تسجيل دخول الموظف</h2><div class="field"><label>اسم المستخدم</label><input id="username" autocomplete="username"></div><div class="field"><label>كلمة المرور</label><input id="password" type="password" autocomplete="current-password"></div><button id="loginBtn" onclick="loadDonations()">دخول وعرض التبرعات</button><div id="loginMsg" class="small" style="margin-top:8px"></div></section>
+<section id="dashboard" class="hidden">
+<div class="card"><div class="row"><h2 style="flex:1;margin:0">طلبات التبرع</h2><button id="refreshBtn" class="secondary" onclick="loadDonations(true)">🔄 تحديث التبرعات</button><button class="secondary" onclick="logout()">تسجيل خروج</button></div><div id="chips" class="chips"></div><div id="sum" class="small"></div></div>
+<div id="flash" class="hidden"></div>
+<section id="detail" class="card hidden"></section>
+<div id="tables"></div></section></div>
+<script>
+const ENDPOINT=(window.JKH_SUPABASE_URL||"https://fpujicazthxvfodgjyui.supabase.co").replace(/\/$/,"")+"/functions/v1/donation-store",APIKEY=(window.JKH_SUPABASE_ANON_KEY||"sb_publishable_LKc8ByQL58bEH674K1f5pA_oyAy44Ol");
+const GROUPS=[["بانتظار مراجعة الإيصال","⏳ تبرعات بانتظار المراجعة","#e0a100"],["تم التحقق من الدفع","✅ تم التحقق من الدفع","#16864b"],["الإيصال مرفوض","❌ الإيصال مرفوض","#c0392b"]];
+let LIST=[],openId=null;
+const el=id=>document.getElementById(id);
+function flash(t,err){const f=el("flash");f.textContent=t;f.className=err?"err":"";f.classList.remove("hidden");if(!err)setTimeout(()=>{if(f.textContent===t)f.classList.add("hidden")},7000);f.scrollIntoView({block:"nearest"})}
+async function call(action,extra={}){const f=new FormData();f.set("action",action);f.set("username",el("username").value.trim());f.set("password",el("password").value);for(const [k,v] of Object.entries(extra))f.set(k,String(v));let r;try{r=await fetch(ENDPOINT,{method:"POST",headers:{apikey:APIKEY},body:f})}catch(e){throw Error("تعذر الاتصال بالخادم. تحقق من الإنترنت ثم أعد المحاولة.")}let d={};try{d=await r.json()}catch{}if(!r.ok)throw Error(d.error||"تعذر تنفيذ العملية.");return d}
+function mk(tag,txt,cls){const n=document.createElement(tag);if(txt!==undefined)n.textContent=txt;if(cls)n.className=cls;return n}
+const money=v=>Number(v||0).toLocaleString("ar-EG")+" ج.م";
+async function loadDonations(manual){const b1=el("loginBtn"),b2=el("refreshBtn");b1.disabled=b2.disabled=true;if(manual)b2.textContent="⏳ جارٍ التحديث…";try{if(!el("password").value)throw Error("انتهت الجلسة. سجّل الدخول من جديد.");const d=await call("staff_list");LIST=d.donations||[];el("login").classList.add("hidden");el("dashboard").classList.remove("hidden");render();if(manual)flash("تم تحديث القائمة ("+LIST.length+" تبرع).")}catch(e){if(el("dashboard").classList.contains("hidden")){el("loginMsg").textContent=e.message;el("loginMsg").style.color="#9b2c20"}else flash(e.message,true);if(/انتهت|مخولين|يلزم|فقط/.test(e.message))logout(e.message)}finally{b1.disabled=b2.disabled=false;b2.textContent="🔄 تحديث التبرعات"}}
+function render(){const ch=el("chips"),box=el("tables");ch.innerHTML="";box.innerHTML="";
+ const okSum=LIST.filter(x=>x.status==="تم التحقق من الدفع").reduce((s,x)=>s+Number(x.amount||0),0);el("sum").textContent="إجمالي المبالغ التي تم التحقق منها: "+money(okSum);
+ for(const [st,title,col] of GROUPS){const list=LIST.filter(x=>x.status===st);
+  const c=mk("button",title.replace(/^\S+\s/,""),"chip"+(st==="بانتظار مراجعة الإيصال"&&list.length?" warn":""));c.appendChild(mk("b",String(list.length)));c.onclick=()=>el("g_"+st).scrollIntoView({behavior:"smooth"});ch.appendChild(c);
+  const sec=mk("section",undefined,"card");sec.id="g_"+st;const h=mk("div",undefined,"sec-h"),dot=mk("span",undefined,"dot");dot.style.background=col;h.append(dot,mk("h3",title+" ("+list.length+")"));sec.appendChild(h);
+  if(!list.length){sec.appendChild(mk("div","لا توجد تبرعات في هذه الحالة.","empty"));box.appendChild(sec);continue}
+  const wrap=mk("div",undefined,"tbl"),t=mk("table"),thead=mk("thead"),hr=mk("tr");for(const n of["م","رقم التبرع","المتبرع","القسم","المبلغ","طريقة الدفع","التاريخ","رد الجمعية","إجراءات"])hr.appendChild(mk("th",n));thead.appendChild(hr);t.appendChild(thead);const tb=mk("tbody");
+  list.forEach((x,i)=>{const tr=mk("tr");for(const v of[String(i+1),x.donation_number,x.donor_name+"\n"+x.donor_phone,x.department,money(x.amount),x.payment_method,x.created_at?new Date(x.created_at).toLocaleDateString("ar-EG"):"",x.review_note||""])tr.appendChild(mk("td",v));
+   const td=mk("td"),op=mk("button",st==="بانتظار مراجعة الإيصال"?"فتح والرد":"عرض / تعديل القرار");op.onclick=()=>openDon(x.id);const rc=mk("button","عرض الإيصال","secondary");rc.onclick=()=>receipt(x.id);td.append(op,rc);tr.appendChild(td);tb.appendChild(tr)});
+  t.appendChild(tb);wrap.appendChild(t);sec.appendChild(wrap);box.appendChild(sec)}
+ if(openId&&LIST.some(x=>x.id===openId))openDon(openId,true);else closeDetail()}
+function closeDetail(){openId=null;el("detail").classList.add("hidden")}
+function openDon(id,keep){const x=LIST.find(r=>r.id===id);if(!x)return;openId=id;const d=el("detail");d.innerHTML="";d.classList.remove("hidden");
+ const top=mk("div",undefined,"row");top.append(mk("h2","تبرع "+x.donation_number),mk("span",x.status,"badge"));const cl=mk("button","إغلاق","secondary");cl.style.marginRight="auto";cl.onclick=closeDetail;top.appendChild(cl);d.appendChild(top);
+ const kv=mk("div",undefined,"kv");for(const [k,v] of [["المتبرع",x.donor_name],["الهاتف",x.donor_phone],["البريد",x.donor_email],["القسم",x.department],["المبلغ",money(x.amount)],["طريقة الدفع",x.payment_method],["ملاحظة المتبرع",x.donor_note],["تاريخ التبرع",x.created_at?new Date(x.created_at).toLocaleString("ar-EG"):""],["الرد الحالي",x.review_note]]){if(!v)continue;kv.append(mk("b",k),mk("span",String(v)))}d.appendChild(kv);
+ const rc=mk("button","🧾 عرض الإيصال","secondary");rc.onclick=()=>receipt(x.id);d.appendChild(rc);
+ const dec=mk("div",undefined,"decide"),sel=mk("select");for(const s of["تم التحقق من الدفع","الإيصال مرفوض"])sel.appendChild(mk("option",s));sel.value=x.status==="الإيصال مرفوض"?"الإيصال مرفوض":"تم التحقق من الدفع";
+ const ta=mk("textarea");ta.placeholder="رد للمتبرع (يظهر له في متابعة التبرع)";ta.maxLength=500;ta.value=x.review_note||"";
+ const sv=mk("button","حفظ القرار والرد");sv.onclick=()=>review(x,sel.value,ta.value,sv);dec.append(mk("label","القرار"),sel,mk("label","الرد الذي يظهر للمتبرع"),ta,sv);d.appendChild(dec);if(!keep)d.scrollIntoView({behavior:"smooth"})}
+async function receipt(id){try{const d=await call("staff_receipt",{id});window.open(d.url,"_blank","noopener")}catch(e){flash(e.message,true)}}
+async function review(x,status,note,btn){if(status==="تم التحقق من الدفع"&&!confirm("هل تحققت فعليًا من وصول المبلغ للحساب؟ لا تؤكد الدفع بناءً على صورة الإيصال فقط."))return;btn.disabled=true;btn.textContent="جارٍ الحفظ…";try{await call("staff_review",{id:x.id,status,review_note:note});closeDetail();await loadDonations();flash("تم حفظ القرار — نُقل التبرع إلى جدول: "+status+". الرد يظهر للمتبرع في «متابعة التبرع».")}catch(e){flash(e.message,true)}finally{btn.disabled=false;btn.textContent="حفظ القرار والرد"}}
+function logout(msg){el("password").value="";LIST=[];openId=null;el("dashboard").classList.add("hidden");el("login").classList.remove("hidden");if(typeof msg==="string"){el("loginMsg").textContent=msg;el("loginMsg").style.color="#9b2c20"}}
+try{const c=window.parent!==window&&window.parent.__inboxCred;if(c){el("username").value=c.u;el("password").value=c.p;loadDonations()}}catch(e){}
+</script></body></html>

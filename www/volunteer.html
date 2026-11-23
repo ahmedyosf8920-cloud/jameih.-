@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#18864b">
+<title>تسجيل متطوع | جمعية الخير للجميع</title>
+<style>
+:root{--g:#18864b;--d:#11663a;--bg:#f1f7f3}*{box-sizing:border-box}
+body{margin:0;font-family:Tahoma,Arial,sans-serif;background:linear-gradient(140deg,#e7f4eb,#f8fbf9);color:#193326}
+.wrap{max-width:780px;margin:24px auto;padding:14px}
+.panel{background:#fff;border-radius:22px;padding:24px;box-shadow:0 12px 38px #173b2515;border:1px solid #e4eee7}
+.head{text-align:center}.logo{width:88px;height:88px;object-fit:contain;border-radius:16px}
+.head h1{font-size:23px;color:var(--d);margin:10px 0}.head p{color:#64756b;margin-top:0}
+.welcome{background:#f0f7f2;border-radius:14px;padding:14px 16px;line-height:2;font-size:14px;margin:16px 0}
+.welcome b{display:block;color:var(--d);font-size:15px}
+.tabs{display:flex;gap:8px;margin:18px 0}.tabs button{flex:1}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:6px}.full{grid-column:1/-1}
+label.l{font-size:13px;font-weight:bold;color:#365746}label.l i{color:#c0392b;font-style:normal;margin-right:3px}
+input[type=text],input[type=tel],input[type=file],select,textarea{width:100%;padding:12px;border:1px solid #d5e3da;border-radius:10px;background:#fff;font:inherit}
+textarea{min-height:90px;resize:vertical}
+button{border:0;border-radius:10px;padding:12px 16px;font:inherit;font-weight:bold;cursor:pointer}
+.primary{background:var(--g);color:#fff}.secondary{background:#eaf4ed;color:#155f38}button:disabled{opacity:.6;cursor:wait}
+.grp{background:#f8fbf9;border:1px solid #e4eee7;border-radius:12px;padding:6px 12px}
+.opt{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:14px;line-height:1.6;cursor:pointer}
+.opt input{width:19px;height:19px;accent-color:var(--g);flex:none;margin:0}
+.opt .oth{flex:1;border:0;border-bottom:1px solid #cfe3d6;border-radius:0;padding:4px}
+.hint{font-size:12px;color:#687c70;line-height:1.7}
+.msg{margin-top:14px;padding:14px;border-radius:12px;background:#f0f7f2;line-height:1.9;overflow-wrap:anywhere}
+.msg.err{background:#fde8e6;color:#9b2c20}
+.code{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff;border:1px dashed #9fcdb0;border-radius:12px;padding:10px 14px;margin:10px 0}
+.code b{font-size:20px;color:var(--d);letter-spacing:1px;direction:ltr}
+.badge{display:inline-block;padding:4px 14px;border-radius:99px;font-weight:bold;font-size:13px}
+.b-ok{background:#e1f5e8;color:#11663a}.b-no{background:#fde8e6;color:#9b2c20}.b-ed{background:#fff3d6;color:#8a5a00}.b-wait{background:#e6eefb;color:#1f4f8f}
+.bad input,.bad textarea,.bad select,.bad .grp{border-color:#c0392b}.bad .e{display:block}.e{display:none;color:#c0392b;font-size:12px}
+.hidden{display:none!important}.foot{text-align:center;color:#738379;font-size:12px;margin:15px}
+body.int .wrap{margin:0;padding:8px}body.int .panel{box-shadow:none;border:0;border-radius:0}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.panel{padding:16px}}
+</style>
+<script src="config.js"></script><script src="vdoc-assets.js?v=33"></script><script src="jkh-vdocs.js?v=38"></script>
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><script src="jkh-look.js?v=32"></script></head>
+<body><div class="wrap"><main class="panel">
+<header class="head"><img class="logo" src="logo.jpg" onerror="this.style.display='none'" alt=""><h1>جمعية الخير للجميع</h1><p>استمارة تسجيل المتطوعين — بني سويف</p></header>
+<div class="welcome"><b>عزيزي المتطوع/ة</b>تهدف هذه الاستمارة إلى تجميع بعض البيانات التي تساعدنا في التواصل معكم وتحديد النشاط المناسب لاهتماماتكم، ونؤكد لكم أن هذه البيانات ملك لجمعية الخير للجميع ولا يحق لأي شخص استخدامها خارج حدود الجمعية.<br>نشكركم على رغبتكم في المشاركة في العمل الخيري والتطوعي.</div>
+<div class="tabs" id="tabs"><button id="applyTab" class="primary" type="button" onclick="tab('apply')">تسجيل متطوع جديد</button><button id="trackTab" class="secondary" type="button" onclick="tab('track')">متابعة طلب سابق</button></div>
+
+<section id="apply">
+<div id="editBanner" class="msg hidden"></div>
+<form id="f" class="grid" novalidate>
+<div class="field full" data-k="name" data-req><label class="l">الاسم رباعي<i>*</i></label><input type="text" name="name" maxlength="160" placeholder="إجابتك"><span class="e">هذا الحقل مطلوب</span></div>
+<div class="field" data-k="national_id" data-req data-len="14"><label class="l">الرقم القومي<i>*</i></label><input type="text" name="national_id" inputmode="numeric" maxlength="14" autocomplete="off" placeholder="14 رقمًا"><span class="e">اكتب الرقم القومي المكوّن من 14 رقمًا</span></div>
+<div class="field" data-k="education" data-req><label class="l">المستوى التعليمي<i>*</i></label><input type="text" name="education" maxlength="120" placeholder="إجابتك"><span class="e">هذا الحقل مطلوب</span></div>
+<div class="field full" data-k="address" data-req><label class="l">العنوان بالتفصيل<i>*</i></label><input type="text" name="address" maxlength="400" placeholder="إجابتك"><span class="e">هذا الحقل مطلوب</span></div>
+<div class="field" data-k="phone" data-req data-min="10"><label class="l">رقم المحمول<i>*</i></label><input type="tel" name="phone" inputmode="tel" maxlength="15" placeholder="إجابتك"><span class="e">اكتب رقم محمول صحيح</span></div>
+<div class="field" data-k="whatsapp" data-req data-min="10"><label class="l">رقم WhatsApp<i>*</i></label><input type="tel" name="whatsapp" inputmode="tel" maxlength="15" placeholder="إجابتك"><span class="e">اكتب رقم واتساب صحيح</span></div>
+<div class="field full" data-k="other_orgs"><label class="l">ما هي الجمعيات الأخرى التي تم التطوع فيها</label><input type="text" name="other_orgs" maxlength="400" placeholder="إجابتك"></div>
+
+<div class="field" data-k="email"><label class="l">البريد الإلكتروني (اختياري)</label><input type="text" name="email" inputmode="email" dir="ltr" maxlength="120" placeholder="example@mail.com"></div>
+<div class="field" data-k="emergency_name"><label class="l">اسم شخص للتواصل في حالات الطوارئ (اختياري)</label><input type="text" name="emergency_name" maxlength="120" placeholder="إجابتك"></div>
+<div class="field" data-k="emergency_phone" data-min="10"><label class="l">رقم جوال شخص الطوارئ (اختياري)</label><input type="tel" name="emergency_phone" inputmode="tel" maxlength="15" placeholder="إجابتك"><span class="e">اكتب رقم محمول صحيح</span></div>
+<div class="field full" data-k="times"><label class="l">أوقات التفرغ (اختياري)</label><div class="grp"><label class="opt"><input type="checkbox" name="times" value="صباحاً">صباحاً</label><label class="opt"><input type="checkbox" name="times" value="مساءً">مساءً</label><label class="opt"><input type="checkbox" name="times" value="أيام الأسبوع">أيام الأسبوع</label><label class="opt"><input type="checkbox" name="times" value="عطلات نهاية الأسبوع">عطلات نهاية الأسبوع</label></div></div>
+
+<div class="field full" data-k="activities" data-req><label class="l">أي من الأنشطة التي تريد المساهمة فيها<i>*</i></label><div class="grp">
+<label class="opt"><input type="checkbox" name="activities" value="التنمية الاجتماعية">التنمية الاجتماعية</label>
+<label class="opt"><input type="checkbox" name="activities" value="التعليم">التعليم</label>
+<label class="opt"><input type="checkbox" name="activities" value="المساعدات">المساعدات</label>
+<label class="opt"><input type="checkbox" name="activities" value="الصحة">الصحة</label>
+<label class="opt"><input type="checkbox" name="activities" value="حرفية">حرفية</label>
+<label class="opt"><input type="checkbox" name="activities" value="دينية">دينية</label>
+<label class="opt"><input type="checkbox" name="activities" value="توعية">توعية</label>
+<label class="opt"><input type="checkbox" name="activities" value="محاربة الفساد">محاربة الفساد</label>
+<label class="opt"><input type="checkbox" name="activities" value="حملات ترفيهية للأطفال بدور الأيتام / حضانات / زيارة دار تحفيظ القرآن">حملات ترفيهية للأطفال بدور الأيتام / حضانات / زيارة دار تحفيظ القرآن</label>
+<label class="opt"><input type="checkbox" name="activities" value="أخرى">أخرى:<input class="oth" type="text" name="activities_other" maxlength="200"></label>
+</div><span class="e">اختر نشاطًا واحدًا على الأقل</span></div>
+
+<div class="field full" data-k="monthly50" data-req><label class="l">هل يمكنك المساهمة بتبرع شهري قدره 50 جنيهًا لصالح الجمعية؟<i>*</i></label><div class="grp">
+<label class="opt"><input type="radio" name="monthly50" value="نعم">نعم</label><label class="opt"><input type="radio" name="monthly50" value="لا">لا</label><label class="opt"><input type="radio" name="monthly50" value="ربما">ربما</label></div><span class="e">هذا الحقل مطلوب</span></div>
+
+<div class="field full" data-k="days" data-req><label class="l">ما هي الأيام التي تريد التطوع فيها<i>*</i></label><input type="text" name="days" maxlength="200" placeholder="مثال: الجمعة والسبت"><span class="e">هذا الحقل مطلوب</span></div>
+<div class="field full" data-k="id_front" data-req><label class="l">تحميل صورة الرقم القومي (وجه)<i>*</i></label><input type="file" id="id_front" accept="image/*,.pdf"><div class="hint" id="h_front">صورة أو PDF، بحد أقصى 10 ميجابايت.</div><span class="e">يلزم إرفاق صورة وجه البطاقة</span></div>
+<div class="field full" data-k="id_back" data-req><label class="l">تحميل صورة الرقم القومي (ظهر)<i>*</i></label><input type="file" id="id_back" accept="image/*,.pdf"><div class="hint" id="h_back">صورة أو PDF، بحد أقصى 10 ميجابايت.</div><span class="e">يلزم إرفاق صورة ظهر البطاقة</span></div>
+<div class="field full" data-k="reason"><label class="l">سبب التطوع</label><textarea name="reason" maxlength="1200" placeholder="إجابتك"></textarea></div>
+<div class="full row" style="display:flex;gap:8px"><button id="sendBtn" class="primary" type="submit" style="flex:2">إرسال</button><button type="button" class="secondary" style="flex:1" onclick="resetForm()">محو النموذج</button></div>
+</form>
+<div id="doneBox" class="msg hidden"></div>
+</section>
+
+<section id="track" class="hidden"><form id="tf" class="grid"><div class="field full"><label class="l">الرقم القومي لمقدم الطلب<i>*</i></label><input id="tnid" type="text" inputmode="numeric" maxlength="14" autocomplete="off" placeholder="14 رقمًا"></div>
+<div class="full"><button id="tBtn" class="primary" type="submit" style="width:100%">عرض حالة الطلب</button></div></form>
+<div id="tres" class="msg hidden"></div><p class="hint">تظهر حالة الطلب (قبول / رفض / طلب تعديل) والرد المسجل لدى الجمعية عند تطابق الرقم القومي مع طلب محفوظ.</p></section>
+</main><div class="foot">جمعية الخير للجميع — بني سويف</div></div>
+
+<script>
+const BASE=(window.JKH_SUPABASE_URL||'https://fpujicazthxvfodgjyui.supabase.co').replace(/\/$/,'');
+const KEY=(window.JKH_SUPABASE_ANON_KEY||'sb_publishable_LKc8ByQL58bEH674K1f5pA_oyAy44Ol');
+const $=id=>document.getElementById(id);
+let INTERNAL=false;try{INTERNAL=/internal=1/.test(location.search)&&window.parent!==window&&typeof window.parent.addVolunteerFromRequest==='function'}catch(e){}
+if(INTERNAL){document.body.classList.add('int');$('tabs').classList.add('hidden');document.querySelector('.welcome').classList.add('hidden')}
+let EDIT=null,OLD={};
+function digits(v){return String(v||'').replace(/[٠-٩۰-۹]/g,c=>String('٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹'.indexOf(c)%10)).replace(/[^0-9]/g,'')}
+function tab(w){$('apply').classList.toggle('hidden',w!=='apply');$('track').classList.toggle('hidden',w!=='track');$('applyTab').className=w==='apply'?'primary':'secondary';$('trackTab').className=w==='track'?'primary':'secondary'}
+async function rpc(fn,args){let r;try{r=await fetch(BASE+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify(args)})}catch(e){throw Error('تعذر الاتصال. تحقق من الإنترنت ثم أعد المحاولة.')}
+ let d=null;try{d=await r.json()}catch{}if(!r.ok)throw Error((d&&d.message)||'تعذر تنفيذ العملية.');return d}
+function uuid(){return (crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2))}
+async function upload(file){if(file.size>10*1024*1024)throw Error('الملف '+file.name+' أكبر من 10 ميجابايت.');if(!(file.type.startsWith('image/')||file.type==='application/pdf'))throw Error('المسموح إرفاق الصور وملفات PDF فقط.');
+ const ext=(file.name.split('.').pop()||'jpg').replace(/[^a-zA-Z0-9]/g,'').slice(0,5)||'jpg';const path=uuid()+'/'+uuid().slice(0,8)+'.'+ext;
+ const r=await fetch(BASE+'/storage/v1/object/volunteer-docs/'+path,{method:'POST',headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':file.type||'application/octet-stream','x-upsert':'false'},body:file});
+ if(!r.ok)throw Error('تعذر رفع الملف. حاول مرة أخرى.');return BASE+'/storage/v1/object/public/volunteer-docs/'+path}
+function collect(){const f=$('f'),o={};for(const el of f.elements){if(!el.name)continue;
+ if(el.type==='checkbox'){(o[el.name]=o[el.name]||[]);if(el.checked)o[el.name].push(el.value)}else if(el.type==='radio'){if(el.checked)o[el.name]=el.value}else o[el.name]=el.value.trim()}
+ o.national_id=digits(o.national_id);o.phone=digits(o.phone);o.whatsapp=digits(o.whatsapp);o.emergency_phone=digits(o.emergency_phone);return o}
+function fill(o){const f=$('f');for(const el of f.elements){if(!el.name||o[el.name]===undefined)continue;if(el.type==='checkbox')el.checked=(o[el.name]||[]).includes(el.value);else if(el.type==='radio')el.checked=o[el.name]===el.value;else el.value=o[el.name]}}
+function resetForm(){$('f').reset();$('id_front').value='';$('id_back').value='';document.querySelectorAll('#f .bad').forEach(c=>c.classList.remove('bad'))}
+function validate(o){let first=null;document.querySelectorAll('#f .field').forEach(c=>{const k=c.dataset.k;let bad=false;
+ if('req' in c.dataset){if(k==='id_front'||k==='id_back'){bad=!($(k).files[0]||OLD[k])&&!INTERNAL}else{const v=o[k];bad=Array.isArray(v)?!v.length:!v}}
+ if(!bad&&c.dataset.len&&o[k]&&o[k].length!==Number(c.dataset.len))bad=true;
+ if(!bad&&c.dataset.min&&o[k]&&(o[k].length<Number(c.dataset.min)||o[k].length>13))bad=true;
+ c.classList.toggle('bad',bad);if(bad&&!first)first=c});
+ if(first){first.scrollIntoView({behavior:'smooth',block:'center'});return false}return true}
+function copyText(t,btn){const ok=()=>{const o=btn.textContent;btn.textContent='تم النسخ';setTimeout(()=>btn.textContent=o,1500)};(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(ok,()=>{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');ok()}catch(e){prompt('انسخ الرقم:',t)}a.remove()})}
+function showDone(code,editMsg){const b=$('doneBox');b.innerHTML='';const p=document.createElement('div');p.textContent=editMsg||'تم استلام طلبك بنجاح. شكرًا لرغبتك في التطوع معنا.';b.appendChild(p);
+ const c=document.createElement('div');c.className='code';const l=document.createElement('span');l.textContent='رقم الطلب:';const n=document.createElement('b');n.textContent=code;const cp=document.createElement('button');cp.type='button';cp.className='secondary';cp.textContent='نسخ رقم الطلب';cp.onclick=()=>copyText(code,cp);c.append(l,n,cp);b.appendChild(c);
+ const h=document.createElement('div');h.className='hint';h.textContent='للمتابعة لاحقًا: افتح تبويب «متابعة طلب سابق» واكتب رقمك القومي لمعرفة القبول أو الرفض أو طلب التعديل.';b.appendChild(h);
+ if(window.LAST_REC&&window.VDocs){const fb=document.createElement('button');fb.type='button';fb.className='primary';fb.style.cssText='margin:10px 0 0;display:block;width:100%';fb.textContent='📄 استمارة التسجيل جاهزة — تحميل PDF أو مشاركة كصورة';fb.onclick=()=>VDocs.open(window.LAST_REC,'form');b.appendChild(fb)}
+ const t=document.createElement('button');t.type='button';t.className='secondary';t.style.marginTop='10px';t.textContent='متابعة الطلب الآن';t.onclick=()=>{$('tnid').value=$('f').dataset.nid||'';tab('track')};b.appendChild(t);
+ $('f').classList.add('hidden');b.classList.remove('hidden');b.scrollIntoView({behavior:'smooth'})}
+$('applyTab').addEventListener('click',()=>{if(!EDIT){$('doneBox').classList.add('hidden');$('f').classList.remove('hidden')}});
+$('f').addEventListener('submit',async e=>{e.preventDefault();const o=collect();if(!validate(o))return;const b=$('sendBtn');b.disabled=true;b.textContent='جارٍ الإرسال…';
+ try{ for(const k of['id_front','id_back']){const f=$(k).files[0];o[k]=f?await upload(f):(OLD[k]||'')}
+  if(INTERNAL){const r=await window.parent.addVolunteerFromRequest({code:'INT-'+Date.now().toString(36).toUpperCase(),payload:o,status:'مقبول'});$('f').dataset.nid=o.national_id;resetForm();if(r&&r.exists){alert('هذا المتطوع مسجل من قبل (نفس الرقم القومي).')}else{alert('تم تسجيل المتطوع في قائمة المتطوعين.');try{window.parent.closeVolForm()}catch(e){}}return}
+  let code;if(EDIT){const r=await rpc('volunteer_resubmit',{p_nid:EDIT,p_payload:o});code=r.code}else{const r=await rpc('volunteer_submit',{p_payload:o});code=r.code}
+  $('f').dataset.nid=o.national_id;window.LAST_REC={code:code,payload:o,created_at:new Date().toISOString(),status:'تحت المراجعة'};const wasEdit=!!EDIT;EDIT=null;OLD={};$('editBanner').classList.add('hidden');resetForm();showDone(code,wasEdit?'تم إرسال التعديل وإعادة طلبك للمراجعة.':null)}
+ catch(err){alert('لم يتم الإرسال: '+err.message)}finally{b.disabled=false;b.textContent='إرسال'}});
+const ST={'مقبول':['b-ok','تم قبول طلبك'],'مرفوض':['b-no','لم يتم قبول الطلب'],'مطلوب تعديل':['b-ed','مطلوب تعديل بعض البيانات'],'تحت المراجعة':['b-wait','طلبك قيد المراجعة']};
+$('tf').addEventListener('submit',async e=>{e.preventDefault();const b=$('tBtn'),box=$('tres');b.disabled=true;box.className='msg hidden';
+ try{const nid=digits($('tnid').value);if(nid.length!==14)throw Error('اكتب الرقم القومي المكوّن من 14 رقمًا.');const r=await rpc('volunteer_track',{p_nid:nid});if(!r.found)throw Error('لا يوجد طلب مسجل بهذا الرقم القومي.');
+  box.innerHTML='';const s=ST[r.status]||['b-wait',r.status];const bd=document.createElement('span');bd.className='badge '+s[0];bd.textContent=s[1];box.appendChild(bd);
+  const c=document.createElement('div');c.className='code';const n=document.createElement('b');n.textContent=r.code;const cp=document.createElement('button');cp.type='button';cp.className='secondary';cp.textContent='نسخ رقم الطلب';cp.onclick=()=>copyText(r.code,cp);c.append(document.createTextNode('رقم الطلب: '),n,cp);box.appendChild(c);
+  const rp=document.createElement('div');rp.textContent='رد الجمعية: '+(r.reply||'لم يُسجل رد حتى الآن.');box.appendChild(rp);
+  if(r.updated_at){const u=document.createElement('div');u.className='hint';u.textContent='آخر تحديث: '+new Date(r.updated_at).toLocaleString('ar-EG');box.appendChild(u)}
+  if(r.status==='مطلوب تعديل'&&r.payload){const eb=document.createElement('button');eb.type='button';eb.className='primary';eb.style.marginTop='10px';eb.textContent='تعديل بياناتي وإعادة الإرسال';eb.onclick=()=>{EDIT=nid;OLD={id_front:r.payload.id_front,id_back:r.payload.id_back};fill(r.payload);if(OLD.id_front)$('h_front').textContent='تم إرفاق صورة سابقة — اختر ملفًا جديدًا فقط إن أردت استبدالها.';if(OLD.id_back)$('h_back').textContent='تم إرفاق صورة سابقة — اختر ملفًا جديدًا فقط إن أردت استبدالها.';
+   const bn=$('editBanner');bn.textContent='تعديل الطلب '+r.code+' — ملاحظة الجمعية: '+(r.reply||'');bn.classList.remove('hidden');$('doneBox').classList.add('hidden');$('f').classList.remove('hidden');tab('apply');window.scrollTo(0,0)};box.appendChild(eb)}
+  if(r.status==='مقبول'&&r.payload&&window.VDocs){const rec={code:r.code,status:r.status,payload:r.payload,created_at:r.created_at,updated_at:r.updated_at};
+   const cb=document.createElement('button');cb.type='button';cb.className='primary';cb.style.cssText='margin:10px 0 0;display:block;width:100%';cb.textContent='🏅 شهادة قبول العضوية — تحميل PDF أو مشاركة';cb.onclick=()=>VDocs.open(rec,'cert',{send:false});box.appendChild(cb);
+   const fb=document.createElement('button');fb.type='button';fb.className='secondary';fb.style.cssText='margin:8px 0 0;display:block;width:100%';fb.textContent='📄 استمارة التسجيل';fb.onclick=()=>VDocs.open(rec,'form');box.appendChild(fb)}
+  box.className='msg'}catch(err){box.textContent=err.message;box.className='msg err'}finally{b.disabled=false}});
+</script><script>if('serviceWorker' in navigator&&location.protocol.startsWith('http'))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))</script></body></html>
