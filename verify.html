@@ -1,0 +1,43 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>التحقق من إيصال تبرع | جمعية الخير للجميع</title>
+<style>
+:root{--g:#11663a;--bg:#f4faf6;--ink:#1c2b22}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.7 Tahoma,Arial,sans-serif}
+main{max-width:520px;margin:0 auto;padding:20px 16px}
+.card{background:#fff;border:1px solid #dbeadf;border-radius:16px;padding:18px;margin-top:14px;box-shadow:0 2px 10px rgba(17,102,58,.06)}
+h1{font-size:22px;color:var(--g);margin:6px 0;text-align:center}p.sub{text-align:center;color:#587;margin:0}
+label{display:block;margin:10px 0 4px;font-weight:700}input{width:100%;padding:12px;border:1px solid #bcd3c3;border-radius:10px;font:inherit;direction:ltr;text-align:left}
+button{margin-top:14px;width:100%;padding:13px;border:0;border-radius:12px;background:var(--g);color:#fff;font:700 16px Tahoma,Arial;cursor:pointer}button:disabled{opacity:.6}
+.res{border-radius:14px;padding:14px;margin-top:14px}.ok{background:#e7f6ec;border:1px solid #8fd1a6}.bad{background:#fde8e8;border:1px solid #f0a5a5}.warn{background:#fff4dc;border:1px solid #f0cf86}
+.res b{display:inline-block;min-width:92px}
+</style><script src="jkh-look.js?v=32"></script></head><body><main>
+<h1>التحقق من إيصال تبرع</h1><p class="sub">جمعية الخير للجميع</p>
+<form class="card" id="f" autocomplete="off">
+<label for="no">رقم الإيصال</label><input id="no" placeholder="JKH-2026-00001" required>
+<label for="c">رمز التحقق</label><input id="c" placeholder="XXXXXXXX" required maxlength="12">
+<button id="b" type="submit">تحقق</button>
+<div id="r" role="status" aria-live="polite"></div>
+</form>
+<p class="sub" style="margin-top:12px;font-size:13px">لحماية الخصوصية نعرض الاسم الأول فقط. إن لم تتطابق البيانات فلا تعتمد على الإيصال وتواصل معنا.</p>
+</main>
+<script src="config.js"></script>
+<script>
+const $=id=>document.getElementById(id),q=new URLSearchParams(location.search);
+$('no').value=(q.get('no')||'').slice(0,30);$('c').value=(q.get('c')||'').slice(0,12);
+function show(cls,rows){const r=$('r');r.className='res '+cls;r.textContent='';rows.forEach(x=>{const [k,v]=Array.isArray(x)?x:[x,null];const d=document.createElement('div');if(v==null){d.textContent=k;d.style.fontWeight='700'}else{const b=document.createElement('b');b.textContent=k+': ';d.append(b,document.createTextNode(v))}r.appendChild(d)})}
+async function verify(){
+ const b=$('b');b.disabled=true;b.textContent='جارٍ التحقق…';
+ try{
+  const base=String(window.JKH_SUPABASE_URL||'').replace(/\/$/,'');
+  const res=await fetch(base+'/rest/v1/rpc/receipt_verify',{method:'POST',headers:{apikey:window.JKH_SUPABASE_ANON_KEY,Authorization:'Bearer '+window.JKH_SUPABASE_ANON_KEY,'Content-Type':'application/json'},body:JSON.stringify({p_no:$('no').value,p_code:$('c').value})});
+  const d=await res.json();if(!res.ok)throw new Error('تعذر الاتصال');
+  if(d.locked)show('warn',['محاولات كثيرة. حاول لاحقًا.']);
+  else if(d.valid)show('ok',['✔ إيصال صحيح',['رقم الإيصال',d.no],['المبلغ',Number(d.amount).toLocaleString('ar-EG')+' جنيه'],['التاريخ',d.date],['المتبرع',d.donor||'—']]);
+  else if(d.cancelled)show('warn',['⚠ هذا الإيصال ملغي',['رقم الإيصال',d.no]]);
+  else show('bad',['✘ لا يوجد إيصال بهذه البيانات']);
+ }catch(e){show('bad',['تعذر التحقق الآن. حاول مرة أخرى.'])}
+ b.disabled=false;b.textContent='تحقق';
+}
+$('f').addEventListener('submit',e=>{e.preventDefault();verify()});
+if($('no').value&&$('c').value)verify();
+</script></body></html>
