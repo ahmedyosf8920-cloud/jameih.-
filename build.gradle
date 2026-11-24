@@ -2,8 +2,8 @@ plugins { id 'com.android.application' }
 
 // التوقيع النهائي: يُقرأ من متغيرات البيئة (GitHub Secrets) ولا يُحفظ أي سر داخل المستودع
 def ksFile = System.getenv('JKH_KEYSTORE_FILE')
-def vCode = (System.getenv('JKH_VERSION_CODE') ?: '62') as Integer
-def vName = System.getenv('JKH_VERSION_NAME') ?: '62.0.0'
+def vCode = (System.getenv('JKH_VERSION_CODE') ?: '64') as Integer
+def vName = System.getenv('JKH_VERSION_NAME') ?: '64.0.0'
 
 android {
     namespace 'org.jkhair.cases'

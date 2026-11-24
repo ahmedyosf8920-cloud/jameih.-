@@ -1,7 +1,7 @@
 {
   "name": "jkh-cases-desktop",
   "productName": "جمعية الخير للجميع",
-  "version": "62.0.0",
+  "version": "64.0.0",
   "description": "نسخة Windows من نظام جمعية الخير للجميع",
   "main": "main.js",
   "author": "جمعية الخير للجميع",
