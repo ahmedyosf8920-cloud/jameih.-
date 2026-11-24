@@ -1,5 +1,5 @@
 // يخزن ملفات الواجهة فقط؛ لا يخزن اتصالات Supabase أبدًا
-const C='jkh-v63';
+const C='jkh-v62';
 self.addEventListener('install',e=>{self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C&&x.indexOf('jkh-')===0).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==location.origin)return;

@@ -131,13 +131,44 @@ async function drawCert(rec){
   return k.c;
 }
 
-function render(rec,kind){return kind==='cert'?drawCert(rec):drawForm(rec)}
+/* شهادة تقدير: تُرسم بالكامل بالكود (بدون صورة خلفية) */
+async function drawAppr(rec,opt){
+  await loadFont();opt=opt||{};
+  var lg=null;try{lg=await loadImg((window.JKH_LOGO)||'logo.jpg')}catch(e){}
+  var c=drawApprCanvas(rec,opt,lg);
+  try{c.getContext('2d').getImageData(0,0,1,1)}catch(e){c=drawApprCanvas(rec,opt,null)}   // شعار ملوّث (file://) → بدونه
+  return c;
+}
+function drawApprCanvas(rec,opt,lg){
+  var p=rec.payload||{},W=1536,H=1024,c=document.createElement('canvas');c.width=W*S;c.height=H*S;
+  var x=c.getContext('2d');x.scale(S,S);
+  x.fillStyle='#fffdf7';x.fillRect(0,0,W,H);
+  x.strokeStyle=GREEN;x.lineWidth=14;x.strokeRect(34,34,W-68,H-68);
+  x.strokeStyle='#c9a24a';x.lineWidth=4;x.strokeRect(58,58,W-116,H-116);
+  if(lg){try{var lw=130,lh=lw*lg.height/lg.width;x.drawImage(lg,W/2-lw/2,84,lw,lh)}catch(e){}}
+  put(x,'جمعية الخير للجميع',W/2,278,{size:40,align:'center',color:GREEN});
+  put(x,'بني سويف — المشهرة برقم 2069 لسنة 2018',W/2,318,{size:22,align:'center',color:'#5a6b62',weight:'normal'});
+  put(x,'شهادة تقدير',W/2,430,{size:84,align:'center',color:'#9a7a1f'});
+  put(x,'تتقدم الجمعية بخالص الشكر والتقدير إلى المتطوع/ة',W/2,512,{size:32,align:'center',weight:'normal'});
+  put(x,p.name||'',W/2,616,{size:68,max:1000,min:30,align:'center',color:GREEN});
+  var why=opt.reason||'على جهوده المخلصة وعطائه المتميز في العمل التطوعي وخدمة المجتمع';
+  put(x,why,W/2,700,{size:32,max:1200,min:18,align:'center',weight:'normal'});
+  if(opt.period)put(x,'خلال الفترة: '+opt.period,W/2,752,{size:28,max:1100,min:16,align:'center',weight:'normal',color:'#5a6b62'});
+  put(x,'سائلين الله أن يجعل ذلك في ميزان حسناته',W/2,806,{size:28,align:'center',weight:'normal'});
+  var d=cairoDate(opt.date||null);
+  put(x,'التاريخ: '+ar(d.d)+' / '+ar(d.m)+' / '+ar(d.y)+' م',1380,950,{size:26,align:'right'});
+  put(x,'رئيس مجلس الإدارة',420,950,{size:28,align:'center',color:GREEN});
+  x.strokeStyle='#334';x.lineWidth=2;x.beginPath();x.moveTo(280,905);x.lineTo(560,905);x.stroke();
+  put(x,'الختم',W/2,950,{size:24,align:'center',color:'#8a9a92',weight:'normal'});
+  return c;
+}
+function render(rec,kind,opt){return kind==='cert'?drawCert(rec):kind==='appr'?drawAppr(rec,opt):drawForm(rec)}
 function toBlob(c,type,q){return new Promise(function(res,rej){c.toBlob(function(b){b?res(b):rej(new Error('تعذر إنشاء الصورة'))},type,q)})}
 
 /* ---------- PDF (JPEG داخل صفحة واحدة، بدون مكتبات خارجية) ---------- */
 async function pdfFromCanvas(c,kind){
   var jpg=new Uint8Array(await (await toBlob(c,'image/jpeg',0.93)).arrayBuffer());
-  var W=kind==='cert'?842:595,H=kind==='cert'?561:892,enc=new TextEncoder(),parts=[],off=[],len=0;
+  var W=(kind==='cert'||kind==='appr')?842:595,H=(kind==='cert'||kind==='appr')?561:892,enc=new TextEncoder(),parts=[],off=[],len=0;
   function add(u){parts.push(u);len+=u.length}
   function s(t){add(enc.encode(t))}
   function obj(n,body){off[n]=len;s(n+' 0 obj\n'+body+'\nendobj\n')}
@@ -157,7 +188,7 @@ async function pdfFromCanvas(c,kind){
 /* ---------- حفظ / مشاركة ---------- */
 function saveBlob(b,name){var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},4000)}
 function waNum(v){var d=digits(v);if(!d)return '';if(d.indexOf('00')===0)return d.slice(2);if(d[0]==='0')return '20'+d.slice(1);if(d.indexOf('20')===0)return d;return '20'+d}
-function safeName(rec,kind){return (kind==='cert'?'شهادة-':'استمارة-')+String((rec.payload||{}).name||rec.code||'متطوع').replace(/[\\/:*?"<>|\s]+/g,'-').slice(0,40)}
+function safeName(rec,kind){return (kind==='cert'?'شهادة-':kind==='appr'?'تقدير-':'استمارة-')+String((rec.payload||{}).name||rec.code||'متطوع').replace(/[\\/:*?"<>|\s]+/g,'-').slice(0,40)}
 
 /* ---------- النافذة ---------- */
 function css(){
@@ -172,24 +203,24 @@ function css(){
   document.head.appendChild(s);
 }
 async function open(rec,kind,opt){
-  opt=opt||{};css();kind=kind==='cert'?'cert':'form';
+  opt=opt||{};css();kind=kind==='cert'?'cert':kind==='appr'?'appr':'form';
   var old=document.getElementById('vdocs');if(old)old.remove();
   var p=rec.payload||{},o=document.createElement('div');o.id='vdocs';
-  var title=kind==='cert'?'شهادة قبول عضوية متطوع':'استمارة تسجيل متطوع';
+  var title=kind==='cert'?'شهادة قبول عضوية متطوع':kind==='appr'?'شهادة تقدير متطوع':'استمارة تسجيل متطوع';
   o.innerHTML='<div class="bx"><div class="hd"><span></span><button class="s" style="flex:none;min-width:0;padding:6px 12px" data-a="x">إغلاق ✕</button></div><div class="pv">جارٍ تجهيز الوثيقة…</div><div class="ac"></div><div class="st"></div></div>';
   o.querySelector('.hd span').textContent=title+' — '+(p.name||'');
   document.body.appendChild(o);
   var pv=o.querySelector('.pv'),ac=o.querySelector('.ac'),st=o.querySelector('.st');
   o.addEventListener('click',function(e){if(e.target===o||(e.target.dataset&&e.target.dataset.a==='x'))o.remove()});
   try{
-    var c=await render(rec,kind),name=safeName(rec,kind);
+    var c=await render(rec,kind,opt),name=safeName(rec,kind);
     var jpg=await toBlob(c,'image/jpeg',0.92),pdf=await pdfFromCanvas(c,kind);
     var url=URL.createObjectURL(jpg);pv.innerHTML='';var im=new Image();im.src=url;im.alt=title;pv.appendChild(im);
     var file=null;try{file=new File([jpg],name+'.jpg',{type:'image/jpeg'})}catch(e){}
     function btn(t,cls,fn){var b=document.createElement('button');b.type='button';b.textContent=t;if(cls)b.className=cls;b.onclick=fn;ac.appendChild(b);return b}
     var phone=waNum(opt.phone||p.whatsapp||p.phone);
-    var text=opt.text||((kind==='cert'?'شهادة قبول عضوية متطوع':'استمارة تسجيل متطوع')+' — جمعية الخير للجميع'+(p.name?'\nالسيد/ة '+p.name:''));
-    btn(kind==='cert'&&opt.send!==false?'📲 إرسال الشهادة للمتطوع (صورة)':'📲 إرسال كصورة','',function(){
+    var text=opt.text||((kind==='cert'?'شهادة قبول عضوية متطوع':kind==='appr'?'شهادة تقدير':'استمارة تسجيل متطوع')+' — جمعية الخير للجميع'+(p.name?'\nالسيد/ة '+p.name:''));
+    btn((kind==='cert'||kind==='appr')&&opt.send!==false?'📲 إرسال الشهادة للمتطوع (صورة)':'📲 إرسال كصورة','',function(){
       if(file&&navigator.canShare&&navigator.canShare({files:[file]})){
         st.textContent='اختر واتساب ثم المتطوع من قائمة المشاركة.';
         navigator.share({files:[file],text:text,title:title}).catch(function(e){if(e&&e.name!=='AbortError')st.textContent='تعذرت المشاركة: '+(e.message||e)});return}
