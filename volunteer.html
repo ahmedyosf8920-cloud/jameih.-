@@ -36,7 +36,7 @@ button{border:0;border-radius:10px;padding:12px 16px;font:inherit;font-weight:bo
 body.int .wrap{margin:0;padding:8px}body.int .panel{box-shadow:none;border:0;border-radius:0}
 @media(max-width:560px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.panel{padding:16px}}
 </style>
-<script src="config.js"></script><script src="vdoc-assets.js?v=33"></script><script src="jkh-vdocs.js?v=38"></script>
+<script src="config.js"></script><script src="vdoc-assets.js?v=33"></script><script src="jkh-vdocs.js?v=39"></script>
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><script src="jkh-look.js?v=32"></script></head>
 <body><div class="wrap"><main class="panel">
 <header class="head"><img class="logo" src="logo.jpg" onerror="this.style.display='none'" alt=""><h1>جمعية الخير للجميع</h1><p>استمارة تسجيل المتطوعين — بني سويف</p></header>
@@ -143,4 +143,5 @@ $('tf').addEventListener('submit',async e=>{e.preventDefault();const b=$('tBtn')
    const cb=document.createElement('button');cb.type='button';cb.className='primary';cb.style.cssText='margin:10px 0 0;display:block;width:100%';cb.textContent='🏅 شهادة قبول العضوية — تحميل PDF أو مشاركة';cb.onclick=()=>VDocs.open(rec,'cert',{send:false});box.appendChild(cb);
    const fb=document.createElement('button');fb.type='button';fb.className='secondary';fb.style.cssText='margin:8px 0 0;display:block;width:100%';fb.textContent='📄 استمارة التسجيل';fb.onclick=()=>VDocs.open(rec,'form');box.appendChild(fb)}
   box.className='msg'}catch(err){box.textContent=err.message;box.className='msg err'}finally{b.disabled=false}});
-</script><script>if('serviceWorker' in navigator&&location.protocol.startsWith('http'))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))</script></body></html>
+</script><script>if('serviceWorker' in navigator&&location.protocol.startsWith('http'))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))</script><script src="jkh-scan62.js?v=62.0"></script>
+</body></html>

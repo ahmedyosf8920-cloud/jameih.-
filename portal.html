@@ -45,4 +45,5 @@ const body=new FormData();body.set('action','submit');body.set('applicant',JSON.
 const result=await request(body);show('applyMsg','تم استلام الطلب بنجاح.\nرقم الملف: '+result.case_number+'\nرمز المتابعة: '+result.tracking_token+'\nاحتفظ بالبيانات للرجوع إليها.');$('applyForm').reset();
 }catch(err){show('applyMsg','لم يتم إرسال الطلب. '+(err.message||'حدث خطأ غير متوقع'));}finally{btn.disabled=false;}});
 $('trackForm').addEventListener('submit',async e=>{e.preventDefault();const btn=$('trackBtn');btn.disabled=true;$('trackMsg').classList.add('hidden');try{const nid=digits($('trackNid').value);if(nid.length!==14)throw Error('اكتب الرقم القومي المكوّن من 14 رقمًا.');const body=new FormData();body.set('action','track');body.set('national_id',nid);const r=await request(body);show('trackMsg','رقم الملف: '+r.case_number+'\nحالة الملف: '+r.file_status+'\nرد الجمعية: '+(r.decision_reason||'لم يُسجل رد حتى الآن.')+'\nآخر تحديث: '+(r.updated_at?new Date(r.updated_at).toLocaleString('ar-EG'):'غير متاح'));}catch(err){show('trackMsg',err.message||'تعذر إتمام المتابعة.');}finally{btn.disabled=false;}});
-</script></body></html>
+</script><script src="jkh-scan62.js?v=62.0"></script>
+</body></html>
